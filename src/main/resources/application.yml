@@ -1,0 +1,33 @@
+# Spring config
+spring:
+    application.name: sgi
+    config:
+        import: optional:file:.env[.properties]
+    datasource:
+        url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+        driver-class-name: org.postgresql.Driver
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+        # HikariCP config
+        hikari:
+            minimum-idle: 5             # Mínimo de conexiones en el pool
+            maximum-pool-size: 10       # Máximo de conexiones en el pool
+            idle-timeout: 3600000       # Tiempo antes de cerrar conexiones inactivas
+            connection-timeout: 30000   # Tiempo máximo de espera para obtener una conexión
+            auto-commit: false          # Deshabilitar auto-commit para gestionar transacciones manualmente
+
+    servlet:
+        multipart:
+            # Enabled archive send of the Email and maximum size archive
+            enabled: true
+            max-file-size: 10MB
+            max-request-size: 10MB
+    jackson:
+        # Date format
+        time-zone: UTC
+        date-format: yyyy-MM-dd'T'HH:mm:ss
+
+# Server config
+server:
+    address: localhost
+    port: ${PORT}
