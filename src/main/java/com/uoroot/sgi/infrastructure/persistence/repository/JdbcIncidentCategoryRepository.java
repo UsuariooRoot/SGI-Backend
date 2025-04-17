@@ -10,7 +10,7 @@ import com.uoroot.sgi.domain.model.IncidentCategory;
 import com.uoroot.sgi.domain.repository.IncidentCategoryRepository;
 import com.uoroot.sgi.infrastructure.persistence.mapper.IncidentCategoryMapper;
 import com.uoroot.sgi.infrastructure.persistence.row.IncidentCategoryRow;
-import com.uoroot.sgi.infrastructure.persistence.row.IncidentCategoryRowMapper;
+import com.uoroot.sgi.infrastructure.persistence.row.mapper.IncidentCategoryRowMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,12 +25,10 @@ public class JdbcIncidentCategoryRepository implements IncidentCategoryRepositor
 
     @Override
     public List<IncidentCategory> findAll() {
-        String sql = "SELECT * FROM get_category_team_and_incidents()";
+        String sql = "SELECT * FROM ufn_get_category_team_and_incidents()";
         List<IncidentCategoryRow> rows = jdbcTemplate.query(sql, new IncidentCategoryRowMapper());
         
         return incidentCategoryResponseMapper.toListIncidentCategory(rows);
     }
-
-
 
 }

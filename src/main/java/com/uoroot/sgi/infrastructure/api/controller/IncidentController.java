@@ -49,15 +49,16 @@ public class IncidentController {
     }
 
     @GetMapping("/categorized")
-    public ResponseEntity<List<IncidentCategoryResponse>> getAllIncidentCategories() {
+    public ResponseEntity<ApiResponse<List<IncidentCategoryResponse>>> getAllIncidentCategories() {
         var categoryIncidents = incidentCategoryService.getAllIncidentCategories();
-        return ResponseEntity.ok(mapper.toListIncidentCategoryResponse(categoryIncidents));
+        return ResponseEntity.ok(new ApiResponse<>(mapper.toListIncidentCategoryResponse(categoryIncidents),
+                categoryIncidents.size()));
     }
 
     @PostMapping()
-    public ResponseEntity<IncidentRequest> createIncident(@RequestBody IncidentRequest incident) {
-        incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
-        return ResponseEntity.ok(incident);
+    public ResponseEntity<IncidentResponse> createIncident(@RequestBody IncidentRequest incident) {
+        Incident savedIncident = incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
+        return ResponseEntity.ok(incidentResponseMapper.toIncidentResponse(savedIncident));
     }
 
 }

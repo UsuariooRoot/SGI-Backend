@@ -1,10 +1,12 @@
-package com.uoroot.sgi.infrastructure.persistence.row;
+package com.uoroot.sgi.infrastructure.persistence.row.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
+
+import com.uoroot.sgi.infrastructure.persistence.row.IncidentCategoryRow;
 
 public class IncidentCategoryRowMapper implements RowMapper<IncidentCategoryRow> {
 

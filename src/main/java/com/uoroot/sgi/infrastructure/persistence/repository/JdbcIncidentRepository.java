@@ -3,11 +3,12 @@ package com.uoroot.sgi.infrastructure.persistence.repository;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.uoroot.sgi.domain.model.Incident;
 import com.uoroot.sgi.domain.repository.IncidentRepository;
+import com.uoroot.sgi.infrastructure.persistence.row.mapper.IncidentRowMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,15 +21,16 @@ public class JdbcIncidentRepository implements IncidentRepository {
     @Override
     public List<Incident> findAll() {
         String sql = "SELECT c_incident, x_description, c_category, c_priority FROM Incidents";
-        return jdbcTemplate.query(sql, incidentRowMapper());
+        return jdbcTemplate.query(sql, new IncidentRowMapper());
     }
 
     @Override
     public Incident findById(Integer id) {
         String sql = "SELECT c_incident, x_description, c_category, c_priority FROM Incidents WHERE c_incident = ?";
-        return jdbcTemplate.queryForObject(sql, incidentRowMapper(), id);
+        return jdbcTemplate.queryForObject(sql, new IncidentRowMapper(), id);
     }
 
+    @Transactional
     @Override
     public Incident save(Incident incident) {
         if (incident.getId() == null) {
@@ -50,14 +52,5 @@ public class JdbcIncidentRepository implements IncidentRepository {
     public void delete(Integer id) {
         String sql = "DELETE FROM Incidents WHERE c_incident = ?";
         jdbcTemplate.update(sql, id);
-    }
-
-    private RowMapper<Incident> incidentRowMapper() {
-        return (rs, rowNum) -> Incident.builder()
-                .id(rs.getInt("c_incident"))
-                .description(rs.getString("x_description"))
-                .categoryId(rs.getInt("c_category"))
-                .priorityId(rs.getInt("c_priority"))
-                .build();
     }
 }
