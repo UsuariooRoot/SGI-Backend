@@ -38,8 +38,6 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getEmployees(
             @RequestParam(required = false, name = "it_team_id") Integer itTeamId,
             @RequestParam(required = false, name = "role_id") Integer roleId) {
-        // System.out.println("itTeamId: " + itTeamId);
-        // System.out.println("roleId: " + roleId);
         List<EmployeeResponse> employees = employeeResponseMapper
                 .toEmployeeResponseList(employeeService.getEmployees(itTeamId, roleId));
         return ResponseEntity.ok(new ApiResponse<>(employees, employees.size()));

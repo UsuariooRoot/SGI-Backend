@@ -1,4 +1,4 @@
-package com.uoroot.sgi.infrastructure.persistence.row;
+package com.uoroot.sgi.infrastructure.persistence.row.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

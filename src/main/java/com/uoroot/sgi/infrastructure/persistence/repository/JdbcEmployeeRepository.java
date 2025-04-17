@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uoroot.sgi.domain.model.Employee;
 import com.uoroot.sgi.domain.repository.EmployeeRepository;
-import com.uoroot.sgi.infrastructure.persistence.row.EmployeRowMapper;
+import com.uoroot.sgi.infrastructure.persistence.row.mapper.EmployeRowMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +32,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     @Override
     public Employee findById(Long id) {
-        String sql = "ufn_get_employee_by_id(:employeeId)";
+        String sql = "SELECT * FROM ufn_get_employee_by_id(:employeeId)";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("employeeId", id);
@@ -56,33 +56,37 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     private void insertEmployee(Employee employee) {
         String sql = """
                 INSERT INTO Employees (x_name, x_paternal_surname, x_maternal_surname, x_email, n_role, c_it_team)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (:name, :paternalSurname, :maternalSurname, :email, :roleId, :itTeamId)
                 """;
 
-        namedJdbcTemplate.getJdbcTemplate().update(sql,
-                employee.getName(),
-                employee.getPaternalSurname(),
-                employee.getMaternalSurname(),
-                employee.getEmail(),
-                employee.getRole().getId(),
-                employee.getItTeam() != null ? employee.getItTeam().getId() : null);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", employee.getName());
+        params.addValue("paternalSurname", employee.getPaternalSurname());
+        params.addValue("maternalSurname", employee.getMaternalSurname());
+        params.addValue("email", employee.getEmail());
+        params.addValue("roleId", employee.getRole().getId());
+        params.addValue("itTeamId", employee.getItTeam() != null ? employee.getItTeam().getId() : null);
+
+        namedJdbcTemplate.update(sql, params);
     }
 
     private void updateEmployee(Employee employee) {
         String sql = """
                 UPDATE Employees
-                SET x_name = ?, x_paternal_surname = ?, x_maternal_surname = ?, x_email = ?, n_role = ?, c_it_team = ?
-                WHERE c_employee = ?
+                SET x_name = :name, x_paternal_surname = :paternalSurname, x_maternal_surname = :maternalSurname, x_email = :email, n_role = :roleId, c_it_team = :itTeamId
+                WHERE c_employee = :employeeId
                 """;
 
-        namedJdbcTemplate.getJdbcTemplate().update(sql,
-                employee.getName(),
-                employee.getPaternalSurname(),
-                employee.getMaternalSurname(),
-                employee.getEmail(),
-                employee.getRole().getId(),
-                employee.getItTeam() != null ? employee.getItTeam().getId() : null,
-                employee.getId());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", employee.getName());
+        params.addValue("paternalSurname", employee.getPaternalSurname());
+        params.addValue("maternalSurname", employee.getMaternalSurname());
+        params.addValue("email", employee.getEmail());
+        params.addValue("roleId", employee.getRole().getId());
+        params.addValue("itTeamId", employee.getItTeam() != null ? employee.getItTeam().getId() : null);
+        params.addValue("employeeId", employee.getId());
+
+        namedJdbcTemplate.update(sql, params);
     }
 
     @Override
