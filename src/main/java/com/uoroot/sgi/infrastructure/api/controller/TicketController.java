@@ -4,9 +4,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uoroot.sgi.application.service.TicketService;
+import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.FilterTicketRequest;
+import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketHistoryResponser;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketResponse;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketRequestMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketResponseMapper;
@@ -39,6 +41,11 @@ public class TicketController {
         Ticket ticket = ticketService.getTicketById(id);
         return ResponseEntity.ok(ticketResponseMapper.toTicketResponse(ticket));
     }
-    
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<TicketHistoryResponser>>> getTicketCurrentHistory(@PathVariable Long id) {
+        List<History> histories = ticketService.getTicketHistory(id);
+        return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toHistoryResponseList(histories), histories.size()));
+    }
     
 }

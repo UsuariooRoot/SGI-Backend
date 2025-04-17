@@ -79,4 +79,12 @@ public class JdbcTicketRepository implements TicketRepository {
         return histories.isEmpty() ? null : histories.get(0);
     }
 
+    @Override
+    public List<History> findAllHistoryByTicketId(Long id) {
+        String sql = "SELECT * FROM ufn_find_all_history_by_ticket_id(:id)";
+        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
+                new HistoryRowMapper());
+        return histories;
+    }
+
 }

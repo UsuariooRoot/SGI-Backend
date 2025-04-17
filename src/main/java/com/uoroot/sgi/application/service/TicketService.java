@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 
@@ -21,6 +22,10 @@ public class TicketService {
 
     public Ticket getTicketById(Long id) {
         return ticketRepository.findById(id);
+    }
+
+    public List<History> getTicketHistory(Long id) {
+        return ticketRepository.findAllHistoryByTicketId(id);
     }
 
 }

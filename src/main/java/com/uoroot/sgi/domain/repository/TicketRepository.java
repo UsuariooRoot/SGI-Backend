@@ -13,4 +13,6 @@ public interface TicketRepository {
 
     History findHistoryById(Long id);
 
+    List<History> findAllHistoryByTicketId(Long id);
+
 }
