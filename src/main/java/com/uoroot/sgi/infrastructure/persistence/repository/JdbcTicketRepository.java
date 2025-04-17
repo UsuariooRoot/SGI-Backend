@@ -4,15 +4,14 @@ import java.util.List;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.uoroot.sgi.domain.model.Action;
 import com.uoroot.sgi.domain.model.Employee;
-import com.uoroot.sgi.domain.model.FilterTicket;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.ITTeam;
 import com.uoroot.sgi.domain.model.Incident;
@@ -28,22 +27,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JdbcTicketRepository implements TicketRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
+    @SuppressWarnings("null")
     @Override
-    public List<Ticket> findAll(FilterTicket filter) {
-        List<Object> params = new ArrayList<>();
-        StringBuilder sql = new StringBuilder();
+    public List<Ticket> findAll(Ticket.Filter filter) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String sql = "SELECT * FROM ufn_filter_tickets(:showNewTickets, :statusIds, :assignedEmployeeId, :ownerEmployeeId, :dateFrom, :dateTo)";
 
-        sql.append("SELECT * FROM ufn_filter_tickets(?, ?, ?, ?, ?, ?)");
-
-        params.add(filter.isShowNewTickets());
+        params.addValue("showNewTickets", filter.isShowNewTickets());
 
         // Handle status IDs array
         Array statusIdsArray = null;
         if (filter.getStatusIds() != null && !filter.getStatusIds().isEmpty()) {
             try {
-                statusIdsArray = this.jdbcTemplate.getDataSource()
+                statusIdsArray = this.namedJdbcTemplate.getJdbcTemplate().getDataSource()
                         .getConnection()
                         .createArrayOf("integer",
                                 filter.getStatusIds().toArray(new Integer[0]));
@@ -51,22 +49,20 @@ public class JdbcTicketRepository implements TicketRepository {
                 throw new RuntimeException("Error creating SQL array for status IDs", e);
             }
         }
-        params.add(statusIdsArray);
-
-        params.add(filter.getAssignedEmployeeId());
-        params.add(filter.getOwnerEmployeeId());
+        params.addValue("statusIds", statusIdsArray);
+        params.addValue("assignedEmployeeId", filter.getAssignedEmployeeId());
+        params.addValue("ownerEmployeeId", filter.getOwnerEmployeeId());
 
         // Handle date parameters
-        params.add(filter.getDateFrom() != null ? Timestamp.valueOf(filter.getDateFrom()) : null);
-        params.add(filter.getDateTo() != null ? Timestamp.valueOf(filter.getDateTo()) : null);
+        params.addValue("dateFrom", filter.getDateFrom() != null ? Timestamp.valueOf(filter.getDateFrom()) : null);
+        params.addValue("dateTo", filter.getDateTo() != null ? Timestamp.valueOf(filter.getDateTo()) : null);
 
         // Query execution and mapping
-
-        List<Ticket> tickets = jdbcTemplate.query(sql.toString(), ticketRowMapper(), params.toArray());
+        List<Ticket> tickets = this.namedJdbcTemplate.query(sql, params, ticketRowMapper());
 
         // for (Ticket ticket : tickets) {
-        //     History history = findHistoryById(ticket.getCurrentHistory().getId());
-        //     ticket.setCurrentHistory(history);
+        // History history = findHistoryById(ticket.getCurrentHistory().getId());
+        // ticket.setCurrentHistory(history);
         // }
 
         return tickets;
@@ -74,16 +70,18 @@ public class JdbcTicketRepository implements TicketRepository {
 
     @Override
     public Ticket findById(Long id) {
-        String sql = "SELECT * FROM ufn_find_ticket_by_id(?)";
-        List<Ticket> tickets = jdbcTemplate.query(sql, ticketRowMapper(), new Object[]{id});
+        String sql = "SELECT * FROM ufn_find_ticket_by_id(:id)";
+        List<Ticket> tickets = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
+                ticketRowMapper());
         return tickets.isEmpty() ? null : tickets.get(0);
     }
 
     @Override
     public History findHistoryById(Long historyId) {
-        String sql = "SELECT * FROM ufn_find_history_by_id(?)";
-        
-        List<History> histories = jdbcTemplate.query(sql,historyRowMapper(), new Object[]{historyId});
+        String sql = "SELECT * FROM ufn_find_history_by_id(:historyId)";
+
+        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("historyId", historyId),
+                historyRowMapper());
         return histories.isEmpty() ? null : histories.get(0);
     }
 

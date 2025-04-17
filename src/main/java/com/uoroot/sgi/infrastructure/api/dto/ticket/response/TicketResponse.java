@@ -41,7 +41,7 @@ public class TicketResponse {
         private Integer id;
         private String description;
         private Integer categoryId;
-        private Integer priorityId;
+        // private Integer priorityId;
 
     }
     

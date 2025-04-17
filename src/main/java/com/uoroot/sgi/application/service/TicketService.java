@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.uoroot.sgi.domain.model.FilterTicket;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 
@@ -16,7 +15,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
 
-    public List<Ticket> getTickets(FilterTicket filter) {
+    public List<Ticket> getTickets(Ticket.Filter filter) {
         return ticketRepository.findAll(filter);
     }
 

@@ -1,6 +1,7 @@
 package com.uoroot.sgi.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,5 +21,20 @@ public class Ticket {
     private String description;
     private History currentHistory;
     private LocalDateTime created;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Filter {
+
+        private boolean showNewTickets;
+        private List<Integer> statusIds;
+        private Integer assignedEmployeeId;
+        private Integer ownerEmployeeId;
+        private LocalDateTime dateFrom;
+        private LocalDateTime dateTo;
+
+    }
 
 }
