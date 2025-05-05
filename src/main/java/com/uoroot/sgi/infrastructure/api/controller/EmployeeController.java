@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uoroot.sgi.application.service.EmployeeService;
+import com.uoroot.sgi.domain.service.EmployeeService;
 import com.uoroot.sgi.domain.model.Employee;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.employee.request.EmployeRequest;

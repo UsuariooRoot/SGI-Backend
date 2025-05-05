@@ -3,7 +3,7 @@ package com.uoroot.sgi.infrastructure.api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uoroot.sgi.application.service.TicketService;
+import com.uoroot.sgi.domain.service.TicketService;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;

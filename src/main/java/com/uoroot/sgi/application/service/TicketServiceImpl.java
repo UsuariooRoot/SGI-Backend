@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.domain.repository.TicketRepository;
+import com.uoroot.sgi.domain.service.TicketService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TicketService {
+public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
 

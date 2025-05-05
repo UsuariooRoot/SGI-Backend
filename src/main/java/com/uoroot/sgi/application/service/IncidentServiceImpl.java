@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.uoroot.sgi.domain.model.Incident;
 import com.uoroot.sgi.domain.repository.IncidentRepository;
+import com.uoroot.sgi.domain.service.IncidentService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class IncidentService {
+public class IncidentServiceImpl implements IncidentService {
 
     private final IncidentRepository incidentRepository;
 

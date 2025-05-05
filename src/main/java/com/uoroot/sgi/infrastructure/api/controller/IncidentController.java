@@ -3,8 +3,8 @@ package com.uoroot.sgi.infrastructure.api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uoroot.sgi.application.service.IncidentCategoryService;
-import com.uoroot.sgi.application.service.IncidentService;
+import com.uoroot.sgi.domain.service.IncidentCategoryService;
+import com.uoroot.sgi.domain.service.IncidentService;
 import com.uoroot.sgi.domain.model.Incident;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.incident.request.IncidentRequest;
