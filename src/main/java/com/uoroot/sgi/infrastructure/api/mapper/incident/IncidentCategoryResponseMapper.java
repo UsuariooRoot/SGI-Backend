@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.uoroot.sgi.domain.model.Incident;
 import com.uoroot.sgi.domain.model.IncidentCategory;
 import com.uoroot.sgi.infrastructure.api.dto.incident.response.IncidentCategoryResponse;
+import com.uoroot.sgi.infrastructure.api.dto.incident.response.IncidentCategoryResponse.ITTeam;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,10 +23,16 @@ public class IncidentCategoryResponseMapper {
     }
 
     private IncidentCategoryResponse toIncidentCategoryResponse(IncidentCategory category) {
+
+        ITTeam itTeam = ITTeam.builder()
+                .id(category.getItTeam().getId())
+                .name(category.getItTeam().getName())
+                .build();
+
         return IncidentCategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .itTeam(category.getItTeam())
+                .itTeam(itTeam)
                 .incidents(category.getIncidents().stream()
                         .map(this::toIncidentResponse)
                         .collect(Collectors.toList()))

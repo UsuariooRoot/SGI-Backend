@@ -2,8 +2,6 @@ package com.uoroot.sgi.infrastructure.api.dto.incident.response;
 
 import java.util.List;
 
-import com.uoroot.sgi.domain.model.ITTeam;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +17,16 @@ public class IncidentCategoryResponse {
     private String name;
     private ITTeam itTeam;
     private List<Incident> incidents;
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ITTeam {
+        private Integer id;
+        private String name;
+    }
 
     @Data
     @AllArgsConstructor
