@@ -13,5 +13,7 @@ public interface EmployeeRepository {
     Employee save(Employee incident);
 
     void delete(Long id);
+
+    // boolean existsById(Long id);
     
 }

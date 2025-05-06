@@ -31,3 +31,8 @@ spring:
 server:
     address: localhost
     port: ${PORT}
+
+# Configuración de JWT
+jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
