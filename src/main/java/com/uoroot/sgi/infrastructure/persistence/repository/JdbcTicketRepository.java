@@ -43,6 +43,7 @@ public class JdbcTicketRepository implements TicketRepository {
                 throw new RuntimeException("Error creating SQL array for status IDs", e);
             }
         }
+
         params.addValue("statusIds", statusIdsArray);
         params.addValue("assignedEmployeeId", filter.getAssignedEmployeeId());
         params.addValue("ownerEmployeeId", filter.getOwnerEmployeeId());
@@ -53,11 +54,6 @@ public class JdbcTicketRepository implements TicketRepository {
 
         // Query execution and mapping
         List<Ticket> tickets = this.namedJdbcTemplate.query(sql, params, new TicketRowMapper());
-
-        // for (Ticket ticket : tickets) {
-        // History history = findHistoryById(ticket.getCurrentHistory().getId());
-        // ticket.setCurrentHistory(history);
-        // }
 
         return tickets;
     }

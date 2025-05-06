@@ -29,7 +29,7 @@ public class TicketController {
     private final TicketService ticketService;
     private final TicketRequestMapper ticketRequestMapper;
     private final TicketResponseMapper ticketResponseMapper;
-    
+
     @GetMapping
     public ResponseEntity<ApiResponse<List<TicketResponse>>> getTickets(FilterTicketRequest filter) {
         List<Ticket> tickets = ticketService.getTickets(ticketRequestMapper.toFilterTicket(filter));
@@ -45,7 +45,8 @@ public class TicketController {
     @GetMapping("/{id}/history")
     public ResponseEntity<ApiResponse<List<TicketHistoryResponser>>> getTicketCurrentHistory(@PathVariable Long id) {
         List<History> histories = ticketService.getTicketHistory(id);
-        return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toHistoryResponseList(histories), histories.size()));
+        return ResponseEntity
+                .ok(new ApiResponse<>(ticketResponseMapper.toHistoryResponseList(histories), histories.size()));
     }
-    
+
 }

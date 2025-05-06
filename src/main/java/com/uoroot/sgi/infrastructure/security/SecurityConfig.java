@@ -55,17 +55,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth ->
                 auth
                     .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/tickets").hasAuthority("VIEW_TICKETS")
-                    .requestMatchers(HttpMethod.GET, "/api/tickets/**").hasAuthority("VIEW_TICKETS")
-                    .requestMatchers(HttpMethod.POST, "/api/tickets").hasAuthority("CREATE_TICKETS")
-                    .requestMatchers(HttpMethod.PUT, "/api/tickets/**").hasAnyAuthority("UPDATE_TICKETS", "ROLE_EMPLEADO_TI")
-                    .requestMatchers(HttpMethod.DELETE, "/api/tickets/**").hasAuthority("DELETE_TICKETS")
+                    .requestMatchers(HttpMethod.GET, "/api/tickets").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers(HttpMethod.GET, "/api/tickets/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers(HttpMethod.GET, "/api/employees").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers(HttpMethod.GET, "/api/employees/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers(HttpMethod.GET, "/api/incidents").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
                     .anyRequest().authenticated()
             );
 
         // Para permitir H2 Console
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+        // http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

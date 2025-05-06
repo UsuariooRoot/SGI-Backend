@@ -81,25 +81,4 @@ public class JdbcUserRepository implements UserRepository {
         };
     }
 
-    // private void updateEmployee(Employee employee) {
-    // String sql = """
-    // UPDATE Employees
-    // SET x_name = :name, x_paternal_surname = :paternalSurname, x_maternal_surname
-    // = :maternalSurname, x_email = :email, n_role = :roleId, c_it_team = :itTeamId
-    // WHERE c_employee = :employeeId
-    // """;
-
-    // MapSqlParameterSource params = new MapSqlParameterSource();
-    // params.addValue("name", employee.getName());
-    // params.addValue("paternalSurname", employee.getPaternalSurname());
-    // params.addValue("maternalSurname", employee.getMaternalSurname());
-    // params.addValue("email", employee.getEmail());
-    // params.addValue("roleId", employee.getRole().getId());
-    // params.addValue("itTeamId", employee.getItTeam() != null ?
-    // employee.getItTeam().getId() : null);
-    // params.addValue("employeeId", employee.getId());
-
-    // namedJdbcTemplate.update(sql, params);
-    // }
-
 }

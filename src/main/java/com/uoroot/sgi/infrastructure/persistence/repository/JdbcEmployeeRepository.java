@@ -64,7 +64,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     private void insertEmployee(Employee employee) {
         String sql = """
-                INSERT INTO Employees (x_name, x_paternal_surname, x_maternal_surname, x_email, n_role, c_it_team)
+                INSERT INTO Employees (x_name, x_paternal_surname, x_maternal_surname, x_email, c_role, c_it_team)
                 VALUES (:name, :paternalSurname, :maternalSurname, :email, :roleId, :itTeamId)
                 """;
 
@@ -82,7 +82,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     private void updateEmployee(Employee employee) {
         String sql = """
                 UPDATE Employees
-                SET x_name = :name, x_paternal_surname = :paternalSurname, x_maternal_surname = :maternalSurname, x_email = :email, n_role = :roleId, c_it_team = :itTeamId
+                SET x_name = :name, x_paternal_surname = :paternalSurname, x_maternal_surname = :maternalSurname, x_email = :email, c_role = :roleId, c_it_team = :itTeamId
                 WHERE c_employee = :employeeId
                 """;
 

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,6 +57,7 @@ public class IncidentController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_LIDER_EQUIPO_TI')")
     public ResponseEntity<IncidentResponse> createIncident(@RequestBody IncidentRequest incident) {
         Incident savedIncident = incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
         return ResponseEntity.ok(incidentResponseMapper.toIncidentResponse(savedIncident));

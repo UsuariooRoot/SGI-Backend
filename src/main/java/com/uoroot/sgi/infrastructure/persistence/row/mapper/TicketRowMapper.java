@@ -19,7 +19,7 @@ public class TicketRowMapper implements RowMapper<Ticket> {
     public Ticket mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
         // Map Employee creator
         Employee creator = Employee.builder()
-                .id(rs.getLong("c_employee_creator"))
+                .id(rs.getLong("creator_id"))
                 .name(rs.getString("creator_name"))
                 .paternalSurname(rs.getString("creator_paternal_surname"))
                 .maternalSurname(rs.getString("creator_maternal_surname"))
@@ -34,7 +34,7 @@ public class TicketRowMapper implements RowMapper<Ticket> {
 
         // Map Employee owner
         Employee owner = Employee.builder()
-                .id(rs.getLong("c_employee_owner"))
+                .id(rs.getLong("owner_id"))
                 .name(rs.getString("owner_name"))
                 .paternalSurname(rs.getString("owner_paternal_surname"))
                 .maternalSurname(rs.getString("owner_maternal_surname"))
@@ -49,7 +49,7 @@ public class TicketRowMapper implements RowMapper<Ticket> {
 
         // Map Incident
         Incident incident = Incident.builder()
-                .id(rs.getInt("c_incident"))
+                .id(rs.getInt("incident_id"))
                 .description(rs.getString("incident_description"))
                 .categoryId(rs.getInt("incident_category_id"))
                 .priorityId(rs.getInt("incident_priority_id"))
@@ -57,13 +57,13 @@ public class TicketRowMapper implements RowMapper<Ticket> {
 
         // Create the ticket without history (will be loaded separately if needed)
         return Ticket.builder()
-                .id(rs.getLong("c_ticket"))
+                .id(rs.getLong("ticket_id"))
                 .creator(creator)
                 .owner(owner)
                 .incident(incident)
-                .description(rs.getString("x_ticket_description"))
+                .description(rs.getString("ticket_description"))
                 .created(rs.getTimestamp("f_created").toLocalDateTime())
-                .currentHistory(History.builder().id(rs.getLong("n_current_history")).build())
+                .currentHistory(History.builder().id(rs.getLong("current_history_id")).build())
                 .build();
     }
 }
