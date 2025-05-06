@@ -41,6 +41,15 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     }
 
     @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT COUNT(*) FROM Employees WHERE c_employee = ?";
+        Integer count = namedJdbcTemplate
+                .getJdbcTemplate()
+                .queryForObject(sql, Integer.class, new Object[] { id });
+        return count != null && count > 0;
+    }
+
+    @Override
     @Transactional
     public Employee save(Employee employee) {
         if (employee.getId() == null) {
@@ -95,4 +104,5 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
         String sql = "DELETE FROM Employees WHERE c_employee = ?";
         namedJdbcTemplate.getJdbcTemplate().update(sql, id);
     }
+
 }

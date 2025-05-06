@@ -21,21 +21,18 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User findByUsername(String username) {
-        String sql = "SELECT * FROM ufn_get_user_by_name(:username)";
-
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("username", username);
-
-        // return namedJdbcTemplate.getJdbcTemplate().queryForObject(sql,
-        // userRowMapper(), new Object[]{username});
-        return namedJdbcTemplate.queryForObject(sql, params, userRowMapper());
+        String sql = "SELECT * FROM ufn_get_user_by_name(?)";
+        return namedJdbcTemplate
+                .getJdbcTemplate()
+                .queryForObject(sql, userRowMapper(), new Object[] { username });
     }
 
     @Override
     public boolean existsByUsername(String username) {
         String sql = "SELECT COUNT(*) FROM Users WHERE x_username = ?";
-        Integer count = namedJdbcTemplate.getJdbcTemplate().queryForObject(sql, Integer.class,
-                new Object[] { username });
+        Integer count = namedJdbcTemplate
+                .getJdbcTemplate()
+                .queryForObject(sql, Integer.class, new Object[] { username });
         return count != null && count > 0;
     }
 

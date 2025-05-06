@@ -22,20 +22,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     public User registerUser(String username, String password, Long employeeId) {
-        // Verificar si el usuario ya existe
-        // if (userRepository.existsByUsername(username)) {
-        //     throw new RuntimeException("El nombre de usuario ya está en uso");
-        // }
+        // Check if the employee already exists
+        if (employeeRepository.existsById(employeeId)) {
+            throw new RuntimeException("El empleado no existe");
+        }
 
-        // if (employeeRepository.existsById(employeeId)) {
-        //     throw new RuntimeException("El empleado no existe");
-        // }
+        // Check if the user already exists
+        if (userRepository.existsByUsername(username)) {
+            throw new RuntimeException("El nombre de usuario ya está en uso");
+        }
 
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmployee(Employee.builder().id(employeeId).build());
-        user.setEnabled(true);
 
         return userRepository.save(user);
     }
