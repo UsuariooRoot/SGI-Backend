@@ -23,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public User registerUser(String username, String password, Long employeeId) {
         // Check if the employee already exists
-        if (employeeRepository.existsById(employeeId)) {
+        if (!employeeRepository.existsById(employeeId)) {
             throw new RuntimeException("El empleado no existe");
         }
 
