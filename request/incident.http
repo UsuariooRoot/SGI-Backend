@@ -1,0 +1,22 @@
+###
+GET http://localhost:8080/api/incidents
+Authorization: Bearer {{empleado_ti_token}}
+
+###
+GET http://localhost:8080/api/incidents/1
+Authorization: Bearer {{empleado_ti_token}}
+
+###
+GET http://localhost:8080/api/incidents/categorized
+Authorization: Bearer {{empleado_ti_token}}
+
+### Create incident
+POST http://localhost:8080/api/incidents
+Authorization: Bearer {{empleado_ti_token}}
+Content-Type: application/json
+
+{
+    "description": "Esta es una incidencia de prueba",
+    "categoryId": 4,
+    "priorityId": 1
+}

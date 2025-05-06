@@ -1,0 +1,11 @@
+###
+GET http://localhost:8080/api/tickets
+Authorization: Bearer {{empleado_ti_token}}
+
+###
+GET http://localhost:8080/api/tickets/1
+Authorization: Bearer {{empleado_ti_token}}
+
+###
+GET http://localhost:8080/api/tickets/1/history
+Authorization: Bearer {{empleado_ti_token}}

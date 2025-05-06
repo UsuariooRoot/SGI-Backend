@@ -1,0 +1,32 @@
+### Get all employees
+GET http://localhost:8080/api/employees
+Authorization: Bearer {{empleado_ti_token}}
+
+### Get employee by id
+GET http://localhost:8080/api/employees/18
+Authorization: Bearer {{empleado_ti_token}}
+
+### Create employee
+POST http://localhost:8080/api/employees
+Authorization: Bearer {{empleado_ti_token}}
+Content-Type: application/json
+
+{
+    "name": "Mikel",
+    "paternalSurname": "Gomez",
+    "maternalSurname": "Perez",
+    "email": "mikel.gomez@example.com",
+    "roleId": 1,
+    "itTeamId": null
+}
+
+### Update employee
+PUT http://localhost:8080/api/employees/18
+Content-Type: application/json
+
+{
+    "name": "Mikel actualizado"
+}
+
+### Delete employee
+DELETE http://localhost:8080/api/employees/18
