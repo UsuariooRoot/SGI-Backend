@@ -4,10 +4,13 @@ import java.util.List;
 
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Ticket;
+import com.uoroot.sgi.domain.model.Ticket.Filter;;
 
 public interface TicketRepository {
 
-    List<Ticket> findAll(Ticket.Filter filter);
+    List<Ticket> findAll(Filter filter);
+
+    List<Ticket> findByEmployeeOwnerId(Filter filter, Long id);
 
     Ticket findById(Long id);
 

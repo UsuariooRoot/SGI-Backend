@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
+import com.uoroot.sgi.domain.model.Ticket.Filter;
 import com.uoroot.sgi.domain.repository.StatusRepository;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 import com.uoroot.sgi.domain.service.TicketService;
@@ -20,7 +21,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final StatusRepository statusRepository;
 
-    public List<Ticket> getTickets(Ticket.Filter filter) {
+    public List<Ticket> getTickets(Filter filter) {
         return ticketRepository.findAll(filter);
     }
 
@@ -34,6 +35,10 @@ public class TicketServiceImpl implements TicketService {
 
     public List<Status> getStatuses() {
         return statusRepository.findAll();
+    }
+
+    public List<Ticket> getTicketsByRequester(Filter filter, Long employeeId) {
+        return List.of();
     }
 
 }

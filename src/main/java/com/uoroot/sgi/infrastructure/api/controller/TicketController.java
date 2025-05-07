@@ -53,9 +53,17 @@ public class TicketController {
     }
 
     @GetMapping("/statuses")
-    public ResponseEntity<ApiResponse<List<Status>>> getMethodName() {
+    public ResponseEntity<ApiResponse<List<Status>>> getTicketStatuses() {
         List<Status> statuses = ticketService.getStatuses();
         return ResponseEntity.ok(new ApiResponse<>(statuses, statuses.size()));
+    }
+
+    @GetMapping("/requester/{employeeId}")
+    public ResponseEntity<ApiResponse<List<TicketResponse>>> getTicketsByRequester(@PathVariable Long employeeId,
+            FilterTicketRequest filter) {
+        Ticket.Filter filters = ticketRequestMapper.toFilterTicket(filter);
+        List<Ticket> tickets = ticketService.getTicketsByRequester(filters, employeeId);
+        return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toTicketResponseList(tickets), tickets.size()));
     }
 
 }

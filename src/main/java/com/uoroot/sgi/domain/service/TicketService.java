@@ -15,4 +15,6 @@ public interface TicketService {
 
     List<Status> getStatuses();
 
+    List<Ticket> getTicketsByRequester(Ticket.Filter filter, Long employeeId);
+
 }

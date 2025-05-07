@@ -20,6 +20,7 @@ import com.uoroot.sgi.domain.model.ITTeam;
 import com.uoroot.sgi.domain.model.Priority;
 import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
+import com.uoroot.sgi.domain.model.Ticket.Filter;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 import com.uoroot.sgi.infrastructure.persistence.row.mapper.HistoryRowMapper;
 import com.uoroot.sgi.infrastructure.persistence.row.mapper.TicketRowMapper;
@@ -171,6 +172,14 @@ public class JdbcTicketRepository implements TicketRepository {
         Priority priority,
         ITTeam team
     ) {}
+
+    @Override
+    public List<Ticket> findByEmployeeOwnerId(Filter filter, Long id) {
+        List<Ticket> tickets = findAll(filter);
+        return tickets.stream()
+                .filter(ticket -> ticket.getOwner().getId().equals(id))
+                .collect(Collectors.toList());
+    }
 
 
 }
