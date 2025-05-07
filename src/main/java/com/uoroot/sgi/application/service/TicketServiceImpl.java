@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.uoroot.sgi.domain.model.History;
+import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
+import com.uoroot.sgi.domain.repository.StatusRepository;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 import com.uoroot.sgi.domain.service.TicketService;
 
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final StatusRepository statusRepository;
 
     public List<Ticket> getTickets(Ticket.Filter filter) {
         return ticketRepository.findAll(filter);
@@ -27,6 +30,10 @@ public class TicketServiceImpl implements TicketService {
 
     public List<History> getTicketHistory(Long id) {
         return ticketRepository.findAllHistoryByTicketId(id);
+    }
+
+    public List<Status> getStatuses() {
+        return statusRepository.findAll();
     }
 
 }

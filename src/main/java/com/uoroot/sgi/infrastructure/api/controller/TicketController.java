@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uoroot.sgi.domain.service.TicketService;
 import com.uoroot.sgi.domain.model.History;
+import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.FilterTicketRequest;
@@ -21,10 +22,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("api/tickets")
-@CrossOrigin(origins = {"https://tu-dominio-angular.com", "http://localhost:4200"})
+@CrossOrigin(origins = { "https://tu-dominio-angular.com", "http://localhost:4200" })
 @RequiredArgsConstructor
 public class TicketController {
 
@@ -49,6 +51,12 @@ public class TicketController {
         List<History> histories = ticketService.getTicketHistory(id);
         return ResponseEntity
                 .ok(new ApiResponse<>(ticketResponseMapper.toHistoryResponseList(histories), histories.size()));
+    }
+
+    @GetMapping("/statuses")
+    public ResponseEntity<ApiResponse<List<Status>>> getMethodName() {
+        List<Status> statuses = ticketService.getStatuses();
+        return ResponseEntity.ok(new ApiResponse<>(statuses, statuses.size()));
     }
 
 }
