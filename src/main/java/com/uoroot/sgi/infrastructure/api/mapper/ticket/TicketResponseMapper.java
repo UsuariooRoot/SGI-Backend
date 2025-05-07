@@ -14,7 +14,11 @@ import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketResponse;
 @Mapper
 public interface TicketResponseMapper {
     
-    @Mapping(target = "currentHistoryId", source = "ticket.currentHistory.id")
+    @Mapping(target = "currentHistoryId", source = "currentHistory.id")
+    @Mapping(target = "assignedEmployee", source = "currentHistory.assignedEmployee")
+    @Mapping(target = "status", source = "currentHistory.status")
+    @Mapping(target = "priority", source = "currentHistory.priority")
+    @Mapping(target = "itTeam", source = "currentHistory.team")
     TicketResponse toTicketResponse(Ticket ticket);
 
     // default TicketResponse.Employee toEmployee(Employee employee) {

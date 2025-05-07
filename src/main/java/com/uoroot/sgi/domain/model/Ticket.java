@@ -34,6 +34,7 @@ public class Ticket {
         private Integer ownerEmployeeId;
         private LocalDateTime dateFrom;
         private LocalDateTime dateTo;
+        private Integer itTeamId;
 
     }
 

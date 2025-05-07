@@ -12,26 +12,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TicketResponse {
-    
+
     private Long id;
     private Employee creator;
     private Employee owner;
     private Incident incident;
     private String description;
-    private Integer currentHistoryId;
-    // private History currentHistory;
+    private Long currentHistoryId;
+    private Employee assignedEmployee;
+    private Status status;
+    private Priority priority;
+    private ITTeam itTeam;
     private LocalDateTime created;
 
     @Data
     @Builder
     public static class Employee {
+
         private Long id;
         private String name;
         private String paternalSurname;
         private String maternalSurname;
         private String email;
-        // private Integer roleId;
-        // private Integer itTeamId;
+
     }
 
     @Data
@@ -41,45 +44,22 @@ public class TicketResponse {
         private Integer id;
         private String description;
         private Integer categoryId;
-        // private Integer priorityId;
 
     }
-    
-    // @Data
-    // @Builder
-    // public static class History {
-        
-    //     private Long id;
-    //     private Employee employee;
-    //     private Employee assignedEmployee;
-    //     private Action action;
-    //     private Status status;
-    //     private Priority priority;
-    //     private ITTeam team;
-    //     private String comment;
-    //     private LocalDateTime logged;
 
+    public record Status(
+            Integer id,
+            String name) {
+    }
 
-    //     public record Action(
-    //         Integer id,
-    //         String name
-    //     ) {}
-        
-    //     public record Status(
-    //         Integer id,
-    //         String name
-    //     ) {}
+    public record Priority(
+            Integer id,
+            String name) {
+    }
 
-    //     public record Priority(
-    //         Integer id,
-    //         String name
-    //     ) {}
-
-    //     public record ITTeam(
-    //         Integer id,
-    //         String name
-    //     ) {}
-
-    // }
+    public record ITTeam(
+            Integer id,
+            String name) {
+    }
 
 }
