@@ -33,15 +33,16 @@ public class JwtUtil {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         
         Map<String, Object> claims = new HashMap<>();
-        claims.put("employeeId", userDetails.getEmployeeId());
+        claims.put("id", userDetails.getId());
+        claims.put("employee_id", userDetails.getEmployeeId());
         claims.put("role", userDetails.getRole());
-        claims.put("itTeam", userDetails.getItTeam());
+        claims.put("id_it_team", userDetails.getItTeam());
         
         // Agregamos los roles como autoridades en el JWT
         String authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        claims.put("authorities", authorities);
+        claims.put("permissions", authorities);
 
         return Jwts.builder()
                 .setClaims(claims)

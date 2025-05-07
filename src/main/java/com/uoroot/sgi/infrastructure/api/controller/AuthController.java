@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = {"https://tu-dominio-angular.com", "http://localhost:4200"})
 @RequiredArgsConstructor
 public class AuthController {
     
@@ -38,7 +40,7 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(authentication);
         
         Map<String, Object> response = new HashMap<>();
-        response.put("token", jwt);
+        response.put("access_token", jwt);
         
         return ResponseEntity.ok(response);
     }

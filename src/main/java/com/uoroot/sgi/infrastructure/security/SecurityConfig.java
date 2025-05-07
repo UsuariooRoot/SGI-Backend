@@ -61,6 +61,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/employees/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
                     .requestMatchers(HttpMethod.GET, "/api/incidents").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
                     .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
+                    .requestMatchers("/api/incidents/categorized").permitAll()
                     .anyRequest().authenticated()
             );
 

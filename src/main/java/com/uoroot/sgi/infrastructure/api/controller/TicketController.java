@@ -18,11 +18,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("api/tickets")
+@CrossOrigin(origins = {"https://tu-dominio-angular.com", "http://localhost:4200"})
 @RequiredArgsConstructor
 public class TicketController {
 
