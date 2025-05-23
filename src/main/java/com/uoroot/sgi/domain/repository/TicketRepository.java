@@ -18,4 +18,12 @@ public interface TicketRepository {
 
     List<History> findAllHistoryByTicketId(Long id);
 
+    Ticket save(Integer incidentId, String description, Long employeeId);
+
+    void executeAction(Long employeeId,
+            Long ticketId,
+            Integer actionId,
+            Integer updateValue,
+            String comment);
+
 }

@@ -13,14 +13,19 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.uoroot.sgi.domain.model.Employee;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.ITTeam;
+import com.uoroot.sgi.domain.model.Incident;
+import com.uoroot.sgi.domain.model.IncidentCategory;
 import com.uoroot.sgi.domain.model.Priority;
 import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.domain.model.Ticket.Filter;
+import com.uoroot.sgi.domain.repository.IncidentCategoryRepository;
+import com.uoroot.sgi.domain.repository.IncidentRepository;
 import com.uoroot.sgi.domain.repository.TicketRepository;
 import com.uoroot.sgi.infrastructure.persistence.row.mapper.HistoryRowMapper;
 import com.uoroot.sgi.infrastructure.persistence.row.mapper.TicketRowMapper;
@@ -32,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 public class JdbcTicketRepository implements TicketRepository {
 
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
+    private final IncidentRepository incidentRepository;
+    private final IncidentCategoryRepository incidentCategoryRepository;
 
     @SuppressWarnings("null")
     @Override
@@ -181,5 +188,60 @@ public class JdbcTicketRepository implements TicketRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public Ticket save(Integer incidentId, String description, Long employeeId) {
+        Incident incident = incidentRepository.findById(incidentId);
+        IncidentCategory category = incidentCategoryRepository.findById(incident.getCategoryId());
+
+        String sql = "SELECT ufn_create_ticket(:creatorEmployeeId, :ownerEmployeeId, :incidentId, :priorityId, :teamId, :description)";
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("creatorEmployeeId", employeeId);
+        params.addValue("ownerEmployeeId", employeeId);
+        params.addValue("incidentId", incidentId);
+        
+        // Obtenemos los valores de prioridad y equipo del historial actual
+        params.addValue("priorityId", incident.getPriorityId());
+        params.addValue("teamId", category.getItTeam().getId());
+        params.addValue("description", description);
+        
+        // Ejecutamos la función y obtenemos el ID
+        Long ticketId = null;
+        
+        try {
+            ticketId = namedJdbcTemplate.queryForObject(sql, params, Long.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al guardar el ticket: " + e.getMessage(), e);
+        }
+        
+        if (ticketId == null) {
+            throw new RuntimeException("No se pudo obtener el ID del ticket creado");
+        }
+        
+        // Utilizamos el método findById para obtener el ticket completo
+        return findById(ticketId);
+    }
+
+    @Override
+    @Transactional
+    public void executeAction(Long employeeId, Long ticketId, Integer actionId, Integer updateValue, String comment) {
+        String sql = "SELECT ufn_execute_ticket_action(:employeeId, :ticketId, :actionId, :updateValue, :comment)";
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("employeeId", employeeId);
+        params.addValue("ticketId", ticketId);
+        params.addValue("actionId", actionId);
+        params.addValue("updateValue", updateValue);
+        params.addValue("comment", comment);
+        
+        try {
+            namedJdbcTemplate.query(sql, params, rs -> {
+                return null;
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Error al ejecutar acción en el ticket: " + e.getMessage(), e);
+        }
+    }
 
 }

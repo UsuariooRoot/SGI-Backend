@@ -1,4 +1,4 @@
-package com.uoroot.sgi.domain.model;
+package com.uoroot.sgi.infrastructure.api.dto.ticket.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Incident {
+public class CreateTicketFormRequest {
 
-    private Integer id;
+    private Long employeeId;
+    private Integer incidentId;
     private String description;
-    private Integer categoryId;
-    private Integer priorityId;
 
 }

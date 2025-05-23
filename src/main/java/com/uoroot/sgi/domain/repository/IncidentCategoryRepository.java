@@ -8,4 +8,6 @@ public interface IncidentCategoryRepository {
 
     List<IncidentCategory> findAll();
 
+    IncidentCategory findById(Integer id);
+
 }

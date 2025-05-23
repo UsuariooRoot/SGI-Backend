@@ -38,7 +38,20 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public List<Ticket> getTicketsByRequester(Filter filter, Long employeeId) {
-        return List.of();
+        return ticketRepository.findByEmployeeOwnerId(filter, employeeId);
+    }
+
+    public Ticket createTicket(Integer incidentId, String description, Long employeeId) {
+        return ticketRepository.save(incidentId, description, employeeId);
+    }
+
+    public void executeAction(Long employeeId, Long ticketId, Integer actionId, Integer updateValue, String comment) {
+        ticketRepository.executeAction(
+                employeeId,
+                ticketId,
+                actionId,
+                updateValue,
+                "Comentario opcional");
     }
 
 }

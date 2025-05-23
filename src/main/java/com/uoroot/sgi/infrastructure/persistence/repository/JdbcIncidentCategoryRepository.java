@@ -31,4 +31,13 @@ public class JdbcIncidentCategoryRepository implements IncidentCategoryRepositor
         return incidentCategoryResponseMapper.toListIncidentCategory(rows);
     }
 
+    @Override
+    public IncidentCategory findById(Integer id) {
+        List<IncidentCategory> categories = findAll();
+        return categories.stream()
+                .filter(category -> category.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
 }

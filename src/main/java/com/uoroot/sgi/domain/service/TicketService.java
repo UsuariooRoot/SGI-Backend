@@ -17,4 +17,12 @@ public interface TicketService {
 
     List<Ticket> getTicketsByRequester(Ticket.Filter filter, Long employeeId);
 
+    Ticket createTicket(Integer incidentId, String description, Long employeeId);
+
+    void executeAction(Long employeeId,
+            Long ticketId,
+            Integer actionId,
+            Integer updateValue,
+            String comment);
+
 }

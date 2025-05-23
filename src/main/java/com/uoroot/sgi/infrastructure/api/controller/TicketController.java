@@ -8,20 +8,26 @@ import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
 import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
+import com.uoroot.sgi.infrastructure.api.dto.ticket.request.ActionFormRequest;
+import com.uoroot.sgi.infrastructure.api.dto.ticket.request.CreateTicketFormRequest;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.FilterTicketRequest;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketHistoryResponser;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketResponse;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketRequestMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketResponseMapper;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/tickets")
@@ -65,5 +71,32 @@ public class TicketController {
         List<Ticket> tickets = ticketService.getTicketsByRequester(filters, employeeId);
         return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toTicketResponseList(tickets), tickets.size()));
     }
+
+    @PostMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_NO_TI')")
+    public ResponseEntity<TicketResponse> createTicket(@RequestBody @Valid CreateTicketFormRequest request) {
+        Ticket savedTicket = ticketService.createTicket(request.getIncidentId(), request.getDescription(),
+                request.getEmployeeId());
+
+        if (savedTicket == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(ticketResponseMapper.toTicketResponse(savedTicket));
+    }
+
+    @PostMapping("/action")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_TI', 'ROLE_LIDER_EQUIPO_TI')")
+    public String executeAction(@RequestBody @Valid ActionFormRequest request) {
+        System.out.println("form: " + request);
+        ticketService.executeAction(request.getEmployeeId(),
+            request.getTicketId(),
+            request.getActionId(),
+            request.getUpdateValue(),
+            request.getComment());
+
+        return "Accion ejecutada";
+    }
+    
 
 }

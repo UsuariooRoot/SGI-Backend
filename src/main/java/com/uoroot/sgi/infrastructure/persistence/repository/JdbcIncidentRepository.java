@@ -26,6 +26,7 @@ public class JdbcIncidentRepository implements IncidentRepository {
 
     @Override
     public Incident findById(Integer id) {
+        System.out.println("incident id: " + id);
         String sql = "SELECT c_incident, x_description, c_category, c_priority FROM Incidents WHERE c_incident = ?";
         return jdbcTemplate.queryForObject(sql, new IncidentRowMapper(), id);
     }

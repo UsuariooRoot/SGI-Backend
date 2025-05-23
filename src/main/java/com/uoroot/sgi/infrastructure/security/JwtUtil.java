@@ -45,6 +45,7 @@ public class JwtUtil {
         claims.put("permissions", authorities);
 
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
