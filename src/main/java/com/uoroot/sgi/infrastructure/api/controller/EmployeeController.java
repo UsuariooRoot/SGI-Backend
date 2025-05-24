@@ -80,6 +80,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_LIDER_EQUIPO_TI')")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody @Valid Employee employee) {
         try {
             Employee updatedEmployee = employeeService.updateEmployee(id, employee);
@@ -94,6 +95,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_LIDER_EQUIPO_TI')")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         try {
             employeeService.deleteEmployee(id);

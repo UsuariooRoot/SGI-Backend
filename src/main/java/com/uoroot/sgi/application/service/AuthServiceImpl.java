@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uoroot.sgi.domain.exception.EmployeeNotFoundException;
+import com.uoroot.sgi.domain.exception.UsernameAlreadyExistsException;
 import com.uoroot.sgi.domain.model.User;
 import com.uoroot.sgi.domain.model.Employee;
 import com.uoroot.sgi.domain.repository.UserRepository;
@@ -24,12 +26,12 @@ public class AuthServiceImpl implements AuthService {
     public User registerUser(String username, String password, Long employeeId) {
         // Check if the employee already exists
         if (!employeeRepository.existsById(employeeId)) {
-            throw new RuntimeException("El empleado no existe");
+            throw new EmployeeNotFoundException(employeeId);
         }
 
         // Check if the user already exists
         if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("El nombre de usuario ya está en uso");
+            throw new UsernameAlreadyExistsException(username);
         }
 
         User user = new User();

@@ -22,6 +22,8 @@ import com.uoroot.sgi.domain.exception.InvalidTicketActionException;
 import com.uoroot.sgi.domain.exception.InvalidTicketStateException;
 import com.uoroot.sgi.domain.exception.ResourceNotFoundException;
 import com.uoroot.sgi.domain.exception.TicketNotFoundException;
+import com.uoroot.sgi.domain.exception.UserNotFoundException;
+import com.uoroot.sgi.domain.exception.UsernameAlreadyExistsException;
 import com.uoroot.sgi.domain.exception.ValidationException;
 import com.uoroot.sgi.infrastructure.api.dto.ApiError;
 
@@ -52,6 +54,22 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+    
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException ex) {
+        ApiError apiError = new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+    
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        ApiError apiError = new ApiError(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
     
     @ExceptionHandler(IncidentNotFoundException.class)
