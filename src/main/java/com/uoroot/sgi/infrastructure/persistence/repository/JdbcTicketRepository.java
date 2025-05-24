@@ -4,6 +4,7 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -63,12 +64,128 @@ public class JdbcTicketRepository implements TicketRepository {
 
         // Query execution and mapping
         List<Ticket> tickets = this.namedJdbcTemplate.query(sql, params, new TicketRowMapper());
-        System.out.println("tickets: " + tickets);
 
         if (tickets.isEmpty()) {
             return tickets;
         }
         
+        return addMoreInformationToTickets(tickets);
+    }
+
+    @Override
+    public Ticket findById(Long id) {
+        String sql = "SELECT * FROM ufn_find_ticket_by_id(:id)";
+        List<Ticket> tickets = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
+                new TicketRowMapper());
+
+        if (tickets.isEmpty()) {
+            return null;
+        }
+        
+        return addMoreInformationToTickets(tickets).get(0);
+    }
+
+    @Override
+    public History findHistoryById(Long historyId) {
+        String sql = "SELECT * FROM ufn_find_history_by_id(:historyId)";
+
+        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("historyId", historyId),
+                new HistoryRowMapper());
+        return histories.isEmpty() ? null : histories.get(0);
+    }
+
+    @Override
+    public List<History> findAllHistoryByTicketId(Long id) {
+        String sql = "SELECT * FROM ufn_find_all_history_by_ticket_id(:id)";
+        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
+                new HistoryRowMapper());
+        return histories;
+    }
+
+    private <T> Array buildSqlArray(List<T> items, String sqlTypeName) {
+        if (items == null || items.isEmpty()) {
+            return null;
+        }
+
+        try (Connection conn = DataSourceUtils.getConnection(
+                this.namedJdbcTemplate.getJdbcTemplate().getDataSource())) {
+            return conn.createArrayOf(sqlTypeName, items.toArray());
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private record HistoryInfo(
+        Employee assignedEmployee,
+        Status status,
+        Priority priority,
+        ITTeam team
+    ) {}
+
+    @Override
+    public List<Ticket> findByEmployeeOwnerId(Filter filter, Long id) {
+        List<Ticket> tickets = findAll(filter);
+        return tickets.stream()
+                .filter(ticket -> ticket.getOwner().getId().equals(id))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Long save(Integer incidentId, String description, Long employeeId) {
+        Incident incident = incidentRepository.findById(incidentId);
+        IncidentCategory category = incidentCategoryRepository.findById(incident.getCategoryId());
+
+        String sql = "SELECT ufn_create_ticket(:creatorEmployeeId, :ownerEmployeeId, :incidentId, :priorityId, :teamId, :description)";
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("creatorEmployeeId", employeeId);
+        params.addValue("ownerEmployeeId", employeeId);
+        params.addValue("incidentId", incidentId);
+        
+        // Obtenemos los valores de prioridad y equipo del historial actual
+        params.addValue("priorityId", incident.getPriorityId());
+        params.addValue("teamId", category.getItTeam().getId());
+        params.addValue("description", description);
+        
+        // Ejecutamos la función y obtenemos el ID
+        Long ticketId = null;
+        
+        try {
+            ticketId = namedJdbcTemplate.queryForObject(sql, params, Long.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al guardar el ticket: " + e.getMessage(), e);
+        }
+        
+        if (ticketId == null) {
+            throw new RuntimeException("No se pudo obtener el ID del ticket creado");
+        }
+        
+        return ticketId;
+    }
+
+    @Override
+    @Transactional
+    public void executeAction(Long employeeId, Long ticketId, Integer actionId, Integer updateValue, String comment) {
+        String sql = "SELECT ufn_execute_ticket_action(:employeeId, :ticketId, :actionId, :updateValue, :comment)";
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("employeeId", employeeId);
+        params.addValue("ticketId", ticketId);
+        params.addValue("actionId", actionId);
+        params.addValue("updateValue", updateValue);
+        params.addValue("comment", comment);
+        
+        try {
+            namedJdbcTemplate.query(sql, params, rs -> {
+                return null;
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Error al ejecutar acción en el ticket: " + e.getMessage(), e);
+        }
+    }
+
+    private List<Ticket> addMoreInformationToTickets(List<Ticket> tickets) {
         List<Long> historiesIds = tickets.stream()
                 .map(ticket -> ticket.getCurrentHistory().getId())
                 .toList();
@@ -121,7 +238,7 @@ public class JdbcTicketRepository implements TicketRepository {
             );
         }).stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         
-        // Actualizar los tickets con la información de los historiales
+        // Update tickets with history information
         for (Ticket ticket : tickets) {
             HistoryInfo historyInfo = historyInfoMap.get(ticket.getCurrentHistory().getId());
             if (historyInfo != null) {
@@ -133,115 +250,6 @@ public class JdbcTicketRepository implements TicketRepository {
         }
 
         return tickets;
-    }
-
-    @Override
-    public Ticket findById(Long id) {
-        String sql = "SELECT * FROM ufn_find_ticket_by_id(:id)";
-        List<Ticket> tickets = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
-                new TicketRowMapper());
-        return tickets.isEmpty() ? null : tickets.get(0);
-    }
-
-    @Override
-    public History findHistoryById(Long historyId) {
-        String sql = "SELECT * FROM ufn_find_history_by_id(:historyId)";
-
-        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("historyId", historyId),
-                new HistoryRowMapper());
-        return histories.isEmpty() ? null : histories.get(0);
-    }
-
-    @Override
-    public List<History> findAllHistoryByTicketId(Long id) {
-        String sql = "SELECT * FROM ufn_find_all_history_by_ticket_id(:id)";
-        List<History> histories = this.namedJdbcTemplate.query(sql, new MapSqlParameterSource("id", id),
-                new HistoryRowMapper());
-        return histories;
-    }
-
-    private <T> Array buildSqlArray(List<T> items, String sqlTypeName) {
-        if (items == null || items.isEmpty()) {
-            return null;
-        }
-
-        try (Connection conn = DataSourceUtils.getConnection(
-                this.namedJdbcTemplate.getJdbcTemplate().getDataSource())) {
-            return conn.createArrayOf(sqlTypeName, items.toArray());
-        } catch (SQLException e) {
-            return null;
-        }
-    }
-
-    private record HistoryInfo(
-        Employee assignedEmployee,
-        Status status,
-        Priority priority,
-        ITTeam team
-    ) {}
-
-    @Override
-    public List<Ticket> findByEmployeeOwnerId(Filter filter, Long id) {
-        List<Ticket> tickets = findAll(filter);
-        return tickets.stream()
-                .filter(ticket -> ticket.getOwner().getId().equals(id))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public Ticket save(Integer incidentId, String description, Long employeeId) {
-        Incident incident = incidentRepository.findById(incidentId);
-        IncidentCategory category = incidentCategoryRepository.findById(incident.getCategoryId());
-
-        String sql = "SELECT ufn_create_ticket(:creatorEmployeeId, :ownerEmployeeId, :incidentId, :priorityId, :teamId, :description)";
-        
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("creatorEmployeeId", employeeId);
-        params.addValue("ownerEmployeeId", employeeId);
-        params.addValue("incidentId", incidentId);
-        
-        // Obtenemos los valores de prioridad y equipo del historial actual
-        params.addValue("priorityId", incident.getPriorityId());
-        params.addValue("teamId", category.getItTeam().getId());
-        params.addValue("description", description);
-        
-        // Ejecutamos la función y obtenemos el ID
-        Long ticketId = null;
-        
-        try {
-            ticketId = namedJdbcTemplate.queryForObject(sql, params, Long.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el ticket: " + e.getMessage(), e);
-        }
-        
-        if (ticketId == null) {
-            throw new RuntimeException("No se pudo obtener el ID del ticket creado");
-        }
-        
-        // Utilizamos el método findById para obtener el ticket completo
-        return findById(ticketId);
-    }
-
-    @Override
-    @Transactional
-    public void executeAction(Long employeeId, Long ticketId, Integer actionId, Integer updateValue, String comment) {
-        String sql = "SELECT ufn_execute_ticket_action(:employeeId, :ticketId, :actionId, :updateValue, :comment)";
-        
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("employeeId", employeeId);
-        params.addValue("ticketId", ticketId);
-        params.addValue("actionId", actionId);
-        params.addValue("updateValue", updateValue);
-        params.addValue("comment", comment);
-        
-        try {
-            namedJdbcTemplate.query(sql, params, rs -> {
-                return null;
-            });
-        } catch (Exception e) {
-            throw new RuntimeException("Error al ejecutar acción en el ticket: " + e.getMessage(), e);
-        }
     }
 
 }

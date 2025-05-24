@@ -18,7 +18,7 @@ public interface TicketRepository {
 
     List<History> findAllHistoryByTicketId(Long id);
 
-    Ticket save(Integer incidentId, String description, Long employeeId);
+    Long save(Integer incidentId, String description, Long employeeId);
 
     void executeAction(Long employeeId,
             Long ticketId,

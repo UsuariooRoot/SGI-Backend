@@ -15,6 +15,7 @@ import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketHistoryRespon
 import com.uoroot.sgi.infrastructure.api.dto.ticket.response.TicketResponse;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketRequestMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.ticket.TicketResponseMapper;
+import com.uoroot.sgi.infrastructure.api.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,28 +41,27 @@ public class TicketController {
     private final TicketResponseMapper ticketResponseMapper;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TicketResponse>>> getTickets(FilterTicketRequest filter) {
+    public ResponseEntity<ApiResponse<List<TicketResponse>>> getTickets(@Valid FilterTicketRequest filter) {
         List<Ticket> tickets = ticketService.getTickets(ticketRequestMapper.toFilterTicket(filter));
-        return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toTicketResponseList(tickets), tickets.size()));
+        return ResponseBuilder.success(ticketResponseMapper.toTicketResponseList(tickets));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TicketResponse> getTicketById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<TicketResponse>> getTicketById(@PathVariable Long id) {
         Ticket ticket = ticketService.getTicketById(id);
-        return ResponseEntity.ok(ticketResponseMapper.toTicketResponse(ticket));
+        return ResponseBuilder.success(ticketResponseMapper.toTicketResponse(ticket));
     }
 
     @GetMapping("/{id}/history")
     public ResponseEntity<ApiResponse<List<TicketHistoryResponser>>> getTicketCurrentHistory(@PathVariable Long id) {
         List<History> histories = ticketService.getTicketHistory(id);
-        return ResponseEntity
-                .ok(new ApiResponse<>(ticketResponseMapper.toHistoryResponseList(histories), histories.size()));
+        return ResponseBuilder.success(ticketResponseMapper.toHistoryResponseList(histories));
     }
 
     @GetMapping("/statuses")
     public ResponseEntity<ApiResponse<List<Status>>> getTicketStatuses() {
         List<Status> statuses = ticketService.getStatuses();
-        return ResponseEntity.ok(new ApiResponse<>(statuses, statuses.size()));
+        return ResponseBuilder.success(statuses);
     }
 
     @GetMapping("/requester/{employeeId}")
@@ -69,33 +69,28 @@ public class TicketController {
             FilterTicketRequest filter) {
         Ticket.Filter filters = ticketRequestMapper.toFilterTicket(filter);
         List<Ticket> tickets = ticketService.getTicketsByRequester(filters, employeeId);
-        return ResponseEntity.ok(new ApiResponse<>(ticketResponseMapper.toTicketResponseList(tickets), tickets.size()));
+        return ResponseBuilder.success(ticketResponseMapper.toTicketResponseList(tickets));
     }
 
     @PostMapping()
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_NO_TI')")
-    public ResponseEntity<TicketResponse> createTicket(@RequestBody @Valid CreateTicketFormRequest request) {
+    public ResponseEntity<ApiResponse<TicketResponse>> createTicket(@RequestBody @Valid CreateTicketFormRequest request) {
+        System.out.println("Ingreso");
         Ticket savedTicket = ticketService.createTicket(request.getIncidentId(), request.getDescription(),
                 request.getEmployeeId());
-
-        if (savedTicket == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok(ticketResponseMapper.toTicketResponse(savedTicket));
+        return ResponseBuilder.success(ticketResponseMapper.toTicketResponse(savedTicket));
     }
 
     @PostMapping("/action")
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_TI', 'ROLE_LIDER_EQUIPO_TI')")
-    public String executeAction(@RequestBody @Valid ActionFormRequest request) {
-        System.out.println("form: " + request);
+    public ResponseEntity<ApiResponse<String>> executeAction(@RequestBody @Valid ActionFormRequest request) {
         ticketService.executeAction(request.getEmployeeId(),
             request.getTicketId(),
             request.getActionId(),
             request.getUpdateValue(),
             request.getComment());
 
-        return "Accion ejecutada";
+        return ResponseBuilder.success("Acción ejecutada exitosamente");
     }
     
 
