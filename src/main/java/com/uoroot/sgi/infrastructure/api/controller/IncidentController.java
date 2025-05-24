@@ -1,18 +1,21 @@
 package com.uoroot.sgi.infrastructure.api.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uoroot.sgi.domain.exception.BusinessLogicException;
+import com.uoroot.sgi.domain.exception.ResourceNotFoundException;
 import com.uoroot.sgi.domain.service.IncidentCategoryService;
 import com.uoroot.sgi.domain.service.IncidentService;
 import com.uoroot.sgi.domain.model.Incident;
-import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.incident.request.IncidentRequest;
-import com.uoroot.sgi.infrastructure.api.dto.incident.response.IncidentCategoryResponse;
-import com.uoroot.sgi.infrastructure.api.dto.incident.response.IncidentResponse;
 import com.uoroot.sgi.infrastructure.api.mapper.incident.IncidentCategoryResponseMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.incident.IncidentRequestMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.incident.IncidentResponseMapper;
+import com.uoroot.sgi.infrastructure.api.util.ResponseBuilder;
+
+import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,31 +41,52 @@ public class IncidentController {
     private final IncidentRequestMapper incidentRequestMapper;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<IncidentResponse>>> getAllIncidentes() {
-        List<Incident> incidents = incidentService.getAllIncidents();
-        return ResponseEntity.ok(new ApiResponse<>(
-                incidentResponseMapper.toIncidentResponseList(incidents),
-                incidents.size()));
+    public ResponseEntity<?> getAllIncidentes() {
+        try {
+            List<Incident> incidents = incidentService.getAllIncidents();
+            return ResponseBuilder.success(incidentResponseMapper.toIncidentResponseList(incidents));
+        } catch (BusinessLogicException e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (Exception e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener los incidentes: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<IncidentResponse> getIncidentById(@PathVariable Integer id) {
-        Incident incident = incidentService.getIncidentById(id);
-        return ResponseEntity.ok(incidentResponseMapper.toIncidentResponse(incident));
+    public ResponseEntity<?> getIncidentById(@PathVariable Integer id) {
+        try {
+            Incident incident = incidentService.getIncidentById(id);
+            return ResponseBuilder.success(incidentResponseMapper.toIncidentResponse(incident));
+        } catch (ResourceNotFoundException e) {
+            return ResponseBuilder.error(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el incidente: " + e.getMessage());
+        }
     }
 
     @GetMapping("/categorized")
-    public ResponseEntity<ApiResponse<List<IncidentCategoryResponse>>> getAllIncidentCategories() {
-        var categoryIncidents = incidentCategoryService.getAllIncidentCategories();
-        return ResponseEntity.ok(new ApiResponse<>(mapper.toListIncidentCategoryResponse(categoryIncidents),
-                categoryIncidents.size()));
+    public ResponseEntity<?> getAllIncidentCategories() {
+        try {
+            var categoryIncidents = incidentCategoryService.getAllIncidentCategories();
+            return ResponseBuilder.success(mapper.toListIncidentCategoryResponse(categoryIncidents));
+        } catch (BusinessLogicException e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (Exception e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener las categorías de incidentes: " + e.getMessage());
+        }
     }
 
     @PostMapping()
     @PreAuthorize("hasAnyAuthority('ROLE_LIDER_EQUIPO_TI')")
-    public ResponseEntity<IncidentResponse> createIncident(@RequestBody IncidentRequest incident) {
-        Incident savedIncident = incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
-        return ResponseEntity.ok(incidentResponseMapper.toIncidentResponse(savedIncident));
+    public ResponseEntity<?> createIncident(@RequestBody @Valid IncidentRequest incident) {
+        try {
+            Incident savedIncident = incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
+            return ResponseBuilder.success(incidentResponseMapper.toIncidentResponse(savedIncident));
+        } catch (BusinessLogicException e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (Exception e) {
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear el incidente: " + e.getMessage());
+        }
     }
 
 }

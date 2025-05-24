@@ -17,6 +17,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import com.uoroot.sgi.domain.exception.BadRequestException;
 import com.uoroot.sgi.domain.exception.BusinessLogicException;
 import com.uoroot.sgi.domain.exception.EmployeeNotFoundException;
+import com.uoroot.sgi.domain.exception.IncidentNotFoundException;
 import com.uoroot.sgi.domain.exception.InvalidTicketActionException;
 import com.uoroot.sgi.domain.exception.InvalidTicketStateException;
 import com.uoroot.sgi.domain.exception.ResourceNotFoundException;
@@ -47,6 +48,14 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ApiError> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+        ApiError apiError = new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+    
+    @ExceptionHandler(IncidentNotFoundException.class)
+    public ResponseEntity<ApiError> handleIncidentNotFoundException(IncidentNotFoundException ex) {
         ApiError apiError = new ApiError(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage());

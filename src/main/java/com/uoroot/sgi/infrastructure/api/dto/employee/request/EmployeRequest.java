@@ -15,23 +15,23 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmployeRequest {
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 100, message = "Name cannot be longer than 100 characters")
+    @NotBlank(message = "El nombre es requerido")
+    @Size(max = 100, message = "El nombre no puede tener más de 100 caracteres")
     private String name;
 
-    @NotBlank(message = "Paternal surname is required")
-    @Size(max = 100, message = "Paternal surname cannot be longer than 100 characters")
+    @NotBlank(message = "El apellido paterno es requerido")
+    @Size(max = 100, message = "El apellido paterno no puede tener más de 100 caracteres")
     private String paternalSurname;
 
-    @Size(max = 100, message = "Maternal surname cannot be longer than 100 characters")
+    @Size(max = 100, message = "El apellido materno no puede tener más de 100 caracteres")
     private String maternalSurname;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email is not valid")
-    @Size(max = 150, message = "Email cannot be longer than 150 characters")
+    @NotBlank(message = "El correo electrónico es requerido")
+    @Email(message = "El formato del correo electrónico no es válido")
+    @Size(max = 150, message = "El correo electrónico no puede tener más de 150 caracteres")
     private String email;
 
-    @NotNull(message = "Role ID is required")
+    @NotNull(message = "El ID del rol es requerido")
     private Integer roleId;
 
     private Integer itTeamId;
