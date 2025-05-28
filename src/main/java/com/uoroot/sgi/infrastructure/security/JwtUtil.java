@@ -79,4 +79,8 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+    
+    public Long getJwtExpiration() {
+        return jwtExpiration;
+    }
 }
