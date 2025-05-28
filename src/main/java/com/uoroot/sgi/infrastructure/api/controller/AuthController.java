@@ -25,6 +25,9 @@ import com.uoroot.sgi.domain.exception.EmployeeNotFoundException;
 import com.uoroot.sgi.domain.exception.UserNotFoundException;
 import com.uoroot.sgi.domain.exception.UsernameAlreadyExistsException;
 import com.uoroot.sgi.domain.service.AuthService;
+import com.uoroot.sgi.infrastructure.security.TokenBlacklistService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import com.uoroot.sgi.infrastructure.api.dto.auth.request.LoginRequest;
 import com.uoroot.sgi.infrastructure.api.dto.auth.request.RegisterRequest;
 import com.uoroot.sgi.infrastructure.api.util.ResponseBuilder;
@@ -44,6 +47,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final AuthService authService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
@@ -94,5 +98,31 @@ public class AuthController {
         }
     }
 
-
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        try {
+            String headerAuth = request.getHeader("Authorization");
+            String token = null;
+            
+            if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+                token = headerAuth.substring(7);
+                
+                // Verificar que el token sea válido antes de agregarlo a la lista negra
+                if (jwtUtil.validateJwtToken(token)) {
+                    // Invalidar el token agregándolo a la lista negra
+                    tokenBlacklistService.blacklistToken(token);
+                    
+                    // Limpiar el contexto de seguridad
+                    SecurityContextHolder.clearContext();
+                    
+                    return ResponseBuilder.success("Sesión cerrada exitosamente");
+                }
+            }
+            
+            return ResponseBuilder.error(HttpStatus.BAD_REQUEST, "Token inválido o no proporcionado");
+        } catch (Exception e) {
+            logger.error("Error al cerrar sesión: " + e.getMessage());
+            return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error al cerrar sesión");
+        }
+    }
 }
