@@ -7,7 +7,7 @@ import com.uoroot.sgi.domain.service.TicketService;
 import com.uoroot.sgi.domain.model.History;
 import com.uoroot.sgi.domain.model.Status;
 import com.uoroot.sgi.domain.model.Ticket;
-import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
+import com.uoroot.sgi.infrastructure.api.dto.CustomApiResponse;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.ActionFormRequest;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.CreateTicketFormRequest;
 import com.uoroot.sgi.infrastructure.api.dto.ticket.request.FilterTicketRequest;
@@ -41,31 +41,31 @@ public class TicketController {
     private final TicketResponseMapper ticketResponseMapper;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TicketResponse>>> getTickets(@Valid FilterTicketRequest filter) {
+    public ResponseEntity<CustomApiResponse<List<TicketResponse>>> getTickets(@Valid FilterTicketRequest filter) {
         List<Ticket> tickets = ticketService.getTickets(ticketRequestMapper.toFilterTicket(filter));
         return ResponseBuilder.success(ticketResponseMapper.toTicketResponseList(tickets));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<TicketResponse>> getTicketById(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<TicketResponse>> getTicketById(@PathVariable Long id) {
         Ticket ticket = ticketService.getTicketById(id);
         return ResponseBuilder.success(ticketResponseMapper.toTicketResponse(ticket));
     }
 
     @GetMapping("/{id}/history")
-    public ResponseEntity<ApiResponse<List<TicketHistoryResponser>>> getTicketCurrentHistory(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<List<TicketHistoryResponser>>> getTicketCurrentHistory(@PathVariable Long id) {
         List<History> histories = ticketService.getTicketHistory(id);
         return ResponseBuilder.success(ticketResponseMapper.toHistoryResponseList(histories));
     }
 
     @GetMapping("/statuses")
-    public ResponseEntity<ApiResponse<List<Status>>> getTicketStatuses() {
+    public ResponseEntity<CustomApiResponse<List<Status>>> getTicketStatuses() {
         List<Status> statuses = ticketService.getStatuses();
         return ResponseBuilder.success(statuses);
     }
 
     @GetMapping("/requester/{employeeId}")
-    public ResponseEntity<ApiResponse<List<TicketResponse>>> getTicketsByRequester(@PathVariable Long employeeId,
+    public ResponseEntity<CustomApiResponse<List<TicketResponse>>> getTicketsByRequester(@PathVariable Long employeeId,
             FilterTicketRequest filter) {
         Ticket.Filter filters = ticketRequestMapper.toFilterTicket(filter);
         List<Ticket> tickets = ticketService.getTicketsByRequester(filters, employeeId);
@@ -74,8 +74,7 @@ public class TicketController {
 
     @PostMapping()
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_NO_TI')")
-    public ResponseEntity<ApiResponse<TicketResponse>> createTicket(@RequestBody @Valid CreateTicketFormRequest request) {
-        System.out.println("Ingreso");
+    public ResponseEntity<CustomApiResponse<TicketResponse>> createTicket(@RequestBody @Valid CreateTicketFormRequest request) {
         Ticket savedTicket = ticketService.createTicket(request.getIncidentId(), request.getDescription(),
                 request.getEmployeeId());
         return ResponseBuilder.success(ticketResponseMapper.toTicketResponse(savedTicket));
@@ -83,7 +82,7 @@ public class TicketController {
 
     @PostMapping("/action")
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLEADO_TI', 'ROLE_LIDER_EQUIPO_TI')")
-    public ResponseEntity<ApiResponse<String>> executeAction(@RequestBody @Valid ActionFormRequest request) {
+    public ResponseEntity<CustomApiResponse<String>> executeAction(@RequestBody @Valid ActionFormRequest request) {
         ticketService.executeAction(request.getEmployeeId(),
             request.getTicketId(),
             request.getActionId(),

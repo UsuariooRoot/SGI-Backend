@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.uoroot.sgi.infrastructure.api.dto.ApiError;
-import com.uoroot.sgi.infrastructure.api.dto.ApiResponse;
+import com.uoroot.sgi.infrastructure.api.dto.CustomApiResponse;
 
 import java.util.List;
 
@@ -20,8 +20,8 @@ public class ResponseBuilder {
      * @param data The data to include in the response
      * @return ResponseEntity with the data wrapped in an ApiResponse
      */
-    public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
-        return ResponseEntity.ok(new ApiResponse<>(data, getCount(data)));
+    public static <T> ResponseEntity<CustomApiResponse<T>> success(T data) {
+        return ResponseEntity.ok(new CustomApiResponse<>(data, getCount(data)));
     }
 
     /**
@@ -32,8 +32,8 @@ public class ResponseBuilder {
      * @param count The count to include in the response
      * @return ResponseEntity with the data wrapped in an ApiResponse
      */
-    public static <T> ResponseEntity<ApiResponse<T>> success(T data, int count) {
-        return ResponseEntity.ok(new ApiResponse<>(data, count));
+    public static <T> ResponseEntity<CustomApiResponse<T>> success(T data, int count) {
+        return ResponseEntity.ok(new CustomApiResponse<>(data, count));
     }
 
     /**
