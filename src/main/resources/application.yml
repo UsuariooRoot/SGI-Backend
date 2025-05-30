@@ -1,38 +1,79 @@
-# Spring config
+# ===================================================================
+# CONFIGURATION OF THE IMS APPLICATION (Incident Management System)
+# ===================================================================
+
+# ----------------------------------------
+# SPRING MAIN CONFIGURATION
+# ----------------------------------------
 spring:
-    application.name: sgi
+    application:
+        name: sgi
     config:
         import: optional:file:.env[.properties]
+        
+    # PostgreSQL database configuration
     datasource:
         url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
         driver-class-name: org.postgresql.Driver
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
-        # HikariCP config
+        
+        # HikariCP connection pool configuration
         hikari:
-            minimum-idle: 5             # Mínimo de conexiones en el pool
-            maximum-pool-size: 10       # Máximo de conexiones en el pool
-            idle-timeout: 3600000       # Tiempo antes de cerrar conexiones inactivas
-            connection-timeout: 30000   # Tiempo máximo de espera para obtener una conexión
-            auto-commit: false          # Deshabilitar auto-commit para gestionar transacciones manualmente
+            minimum-idle: 5             # Minimum number of connections in the pool
+            maximum-pool-size: 10       # Maximum number of connections in the pool
+            idle-timeout: 3600000       # Time before closing inactive connections (1 hour)
+            connection-timeout: 30000   # Maximum waiting time to get a connection (30 seconds)
+            auto-commit: false          # Disable auto-commit to manage transactions manually
 
+    # File upload configuration
     servlet:
         multipart:
-            # Enabled archive send of the Email and maximum size archive
-            enabled: true
-            max-file-size: 10MB
-            max-request-size: 10MB
+            enabled: true                # Enable file upload
+            max-file-size: 10MB          # Maximum size of individual file
+            max-request-size: 10MB       # Maximum size of the entire request
+            
+    # JSON date format configuration
     jackson:
-        # Date format
-        time-zone: UTC
-        date-format: yyyy-MM-dd'T'HH:mm:ss
+        time-zone: UTC                      # Timezone for dates
+        date-format: yyyy-MM-dd'T'HH:mm:ss  # Simplified ISO-8601 format
 
-# Server config
+# ----------------------------------------
+# SERVER CONFIGURATION
+# ----------------------------------------
 server:
-    address: localhost
-    port: ${PORT}
+    address: localhost                   # Server address
+    port: ${PORT}                        # Server port (from environment variables)
 
-# Configuración de JWT
+# ----------------------------------------
+# SECURITY AND AUTHENTICATION
+# ----------------------------------------
+# JWT configuration (JSON Web Token)
 jwt:
-    secret: ${JWT_SECRET}
-    expiration: ${JWT_EXPIRATION}
+    secret: ${JWT_SECRET}                # Clave secreta para firmar tokens
+    expiration: ${JWT_EXPIRATION}        # Tiempo de expiración en milisegundos
+
+# ----------------------------------------
+# API DOCUMENTACION (SWAGGER/OPENAPI)
+# ----------------------------------------
+springdoc:
+    # API Docs configuration (JSON format)
+    api-docs:
+        path: /v3/api-docs               # Path to access API documentation in JSON format
+        enabled: true                    # Enable documentation
+        
+    # Swagger UI configuration
+    swagger-ui:
+        path: /swagger-ui.html           # Path to access Swagger UI
+        enabled: true                    # Enable Swagger UI
+        operations-sorter: method        # Sort operations by HTTP method
+        tags-sorter: alpha               # Sort tags alphabetically
+        doc-expansion: none              # Do not expand sections by default
+        disable-swagger-default-url: true # Disable default Swagger URL
+        
+    # Default content type configuration
+    default-consumes-media-type: application/json
+    default-produces-media-type: application/json
+    
+    # Path patterns to include in the documentation
+    paths-to-match: /api/**

@@ -15,6 +15,12 @@ import com.uoroot.sgi.infrastructure.api.mapper.incident.IncidentRequestMapper;
 import com.uoroot.sgi.infrastructure.api.mapper.incident.IncidentResponseMapper;
 import com.uoroot.sgi.infrastructure.api.util.ResponseBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,8 +35,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/incidents")
-@CrossOrigin(origins = {"https://tu-dominio-angular.com", "http://localhost:4200"})
 @RequiredArgsConstructor
+@Tag(name = "Incidentes", description = "API para la gestión de incidentes")
 public class IncidentController {
 
     private final IncidentService incidentService;
@@ -40,6 +45,11 @@ public class IncidentController {
     private final IncidentResponseMapper incidentResponseMapper;
     private final IncidentRequestMapper incidentRequestMapper;
 
+    @Operation(summary = "Obtener todos los incidentes", description = "Retorna una lista con todos los incidentes registrados en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de incidentes obtenida exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping
     public ResponseEntity<?> getAllIncidentes() {
         try {
@@ -52,8 +62,15 @@ public class IncidentController {
         }
     }
 
+    @Operation(summary = "Obtener incidente por ID", description = "Retorna un incidente específico según su ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Incidente encontrado"),
+        @ApiResponse(responseCode = "404", description = "Incidente no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<?> getIncidentById(@PathVariable Integer id) {
+    public ResponseEntity<?> getIncidentById(
+        @Parameter(description = "ID del incidente", required = true) @PathVariable Integer id) {
         try {
             Incident incident = incidentService.getIncidentById(id);
             return ResponseBuilder.success(incidentResponseMapper.toIncidentResponse(incident));
@@ -64,6 +81,11 @@ public class IncidentController {
         }
     }
 
+    @Operation(summary = "Obtener incidentes por categorías", description = "Retorna todos los incidentes agrupados por categorías")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categorías de incidentes obtenidas exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/categorized")
     public ResponseEntity<?> getAllIncidentCategories() {
         try {
@@ -76,9 +98,17 @@ public class IncidentController {
         }
     }
 
+    @Operation(summary = "Crear un nuevo incidente", description = "Crea un nuevo incidente en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Incidente creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de incidente inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping()
     @PreAuthorize("hasAnyAuthority('ROLE_LIDER_EQUIPO_TI')")
-    public ResponseEntity<?> createIncident(@RequestBody @Valid IncidentRequest incident) {
+    public ResponseEntity<?> createIncident(
+        @Parameter(description = "Datos del incidente a crear", required = true)
+        @RequestBody @Valid IncidentRequest incident) {
         try {
             Incident savedIncident = incidentService.saveIncident(incidentRequestMapper.toIncident(incident));
             return ResponseBuilder.success(incidentResponseMapper.toIncidentResponse(savedIncident));

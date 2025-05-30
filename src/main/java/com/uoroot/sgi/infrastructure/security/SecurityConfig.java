@@ -64,7 +64,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                 auth
+                    // Public routes for authentication
                     .requestMatchers("/api/auth/**").permitAll()
+                    // Public paths for Swagger/OpenAPI documentation
+                    .requestMatchers("/swagger-ui.html").permitAll()
+                    .requestMatchers("/swagger-ui/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**").permitAll()
+                    // Routes for specific endpoints requiring authentication
                     .requestMatchers(HttpMethod.GET, "/api/tickets").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
                     .requestMatchers(HttpMethod.GET, "/api/tickets/**").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
                     .requestMatchers(HttpMethod.GET, "/api/employees").hasAnyAuthority("ROLE_EMPLEADO_TI", "ROLE_LIDER_EQUIPO_TI", "ROLE_EMPLEADO_NO_TI")
@@ -74,9 +80,6 @@ public class SecurityConfig {
                     .requestMatchers("/api/incidents/categorized").permitAll()
                     .anyRequest().authenticated()
             );
-
-        // Para permitir H2 Console
-        // http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
