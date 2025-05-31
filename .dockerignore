@@ -1,0 +1,44 @@
+# Archivos y directorios de Git
+.git
+.gitignore
+
+# Archivos de configuración de IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Directorios de compilación y dependencias
+target/
+!target/*.jar
+node_modules/
+build/
+dist/
+
+# Archivos de logs
+logs/
+*.log
+
+# Archivos de configuración local
+.env
+.env.*
+!.env.example
+
+# Archivos Docker
+docker-compose.yml
+docker-compose.*.yml
+
+# Archivos de documentación
+README.md
+LICENSE
+*.md
+!README-DEPLOY.md
+
+# Otros archivos que no son necesarios en la imagen
+*.bat
+*.cmd
+mvnw.cmd
