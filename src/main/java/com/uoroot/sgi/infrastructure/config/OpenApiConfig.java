@@ -1,5 +1,6 @@
 package com.uoroot.sgi.infrastructure.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,14 +27,6 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI sgiOpenAPI() {
-        // Server configuration
-        Server devServer = new Server()
-                .url("http://localhost:8080")
-                .description("Servidor de desarrollo local");
-
-        Server prodServer = new Server()
-                .url("https://api.sgi.uoroot.com")
-                .description("Servidor de producción");
 
         // Contact information
         Contact contact = new Contact()
@@ -54,7 +47,7 @@ public class OpenApiConfig {
                 .description("API RESTful para el Sistema de Gestión de Incidentes (SGI). " +
                         "Proporciona endpoints para la gestión completa de tickets, incidentes, " +
                         "empleados y autenticación de usuarios.")
-                .termsOfService("https://www.uoroot.com/terms")
+                // .termsOfService("https://www.uoroot.com/terms")
                 .license(license);
 
         // JWT security configuration
@@ -78,7 +71,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(info)
-                .servers(Arrays.asList(devServer, prodServer))
+                // .servers(List.of(server))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", securityScheme))
                 .addSecurityItem(securityRequirement)
